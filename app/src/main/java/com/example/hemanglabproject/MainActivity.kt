@@ -32,10 +32,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Set initial question
+        // set initial question
         updateQuestion()
 
-        // Set click listeners for True/False
+        // set click listeners for True/False
         binding.trueButton.setOnClickListener {
             checkAnswer(true)
         }
@@ -44,10 +44,11 @@ class MainActivity : AppCompatActivity() {
             checkAnswer(false)
         }
 
-        // Set click listener for Next button
+        // set click listener for Next button
         binding.nextButton.setOnClickListener {
             currentIndex = (currentIndex + 1) % questionBank.size
             updateQuestion()
+            enableAnswerButtons() // Re-enable the answer buttons
         }
     }
 
@@ -87,5 +88,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
+
+        // to disable the true/false buttons after answering
+        disableAnswerButtons()
+    }
+
+    private fun disableAnswerButtons() {
+        binding.trueButton.isEnabled = false
+        binding.falseButton.isEnabled = false
+    }
+
+    private fun enableAnswerButtons() {
+        binding.trueButton.isEnabled = true
+        binding.falseButton.isEnabled = true
     }
 }
