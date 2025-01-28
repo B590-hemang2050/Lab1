@@ -2,7 +2,6 @@ package com.example.hemanglabproject
 
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hemanglabproject.databinding.ActivityMainBinding
@@ -25,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     )
 
     private var currentIndex = 0
+    private var correctAnswers = 0  // Track correct answers
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,42 +32,55 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // set initial question
+        // Set initial question
         updateQuestion()
 
-        // set click listeners for True/False
+        // Set click listeners for True/False
         binding.trueButton.setOnClickListener {
             checkAnswer(true)
+            disableChoices()
         }
 
         binding.falseButton.setOnClickListener {
             checkAnswer(false)
+            disableChoices()
         }
 
-        // set click listener for Next button
+        // Set click listener for Next button
         binding.nextButton.setOnClickListener {
             currentIndex = (currentIndex + 1) % questionBank.size
             updateQuestion()
-            enableAnswerButtons() // Re-enable the answer buttons
+
+            // Enable buttons when moving to the next question
+            enableChoices()
+
+            // If the user has answered all questions, show the score
+            if (currentIndex == 0) {
+                showScore()
+            }
         }
     }
 
     override fun onStart() {
-        super.onStart ()
+        super.onStart()
         Log.d(TAG, "onStart() called")
     }
-    override fun onResume () {
-        super.onResume ( )
+
+    override fun onResume() {
+        super.onResume()
         Log.d(TAG, "onResume() called")
     }
-    override fun onPause () {
-        super.onPause ( )
-        Log.d(TAG, "onPause() called" )
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause() called")
     }
+
     override fun onStop() {
         super.onStop()
         Log.d(TAG, "onStop() called")
     }
+
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "onDestroy() called")
@@ -81,6 +94,12 @@ class MainActivity : AppCompatActivity() {
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = questionBank[currentIndex].answer
 
+        // Update the score if the answer is correct
+        if (userAnswer == correctAnswer) {
+            correctAnswers++
+        }
+
+        // Display correct/incorrect message
         val messageResId = if (userAnswer == correctAnswer) {
             R.string.correct_toast
         } else {
@@ -88,18 +107,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
-
-        // to disable the true/false buttons after answering
-        disableAnswerButtons()
     }
 
-    private fun disableAnswerButtons() {
+    private fun disableChoices() {
         binding.trueButton.isEnabled = false
         binding.falseButton.isEnabled = false
     }
 
-    private fun enableAnswerButtons() {
+    private fun enableChoices() {
         binding.trueButton.isEnabled = true
         binding.falseButton.isEnabled = true
+    }
+
+    private fun showScore() {
+        val totalQuestions = questionBank.size
+        val scorePercentage = (correctAnswers.toDouble() / totalQuestions) * 100
+        val scoreMessage = "Your score: ${scorePercentage.toInt()}%"
+        Toast.makeText(this, scoreMessage, Toast.LENGTH_LONG).show()
     }
 }
