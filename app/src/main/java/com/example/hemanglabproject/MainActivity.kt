@@ -57,6 +57,8 @@ class MainActivity : AppCompatActivity() {
             // If the user has answered all questions, show the score
             if (currentIndex == 0) {
                 showScore()
+                // Reset the score for the next round
+                resetScore()
             }
         }
     }
@@ -124,5 +126,9 @@ class MainActivity : AppCompatActivity() {
         val scorePercentage = (correctAnswers.toDouble() / totalQuestions) * 100
         val scoreMessage = "Your score: ${scorePercentage.toInt()}%"
         Toast.makeText(this, scoreMessage, Toast.LENGTH_LONG).show()
+    }
+
+    private fun resetScore() {
+        correctAnswers = 0  // reset score for the next round
     }
 }
