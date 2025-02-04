@@ -12,9 +12,7 @@ private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
     private val quizViewModel: QuizViewModel by viewModels()
-
     private var correctAnswers = 0  // Track correct answers
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,18 +27,18 @@ class MainActivity : AppCompatActivity() {
         updateQuestion()
 
         // Set click listeners for True/False buttons
-        binding.trueButton.setOnClickListener {
+        binding.trueButton?.setOnClickListener {
             checkAnswer(true)
             disableChoices()
         }
 
-        binding.falseButton.setOnClickListener {
+        binding.falseButton?.setOnClickListener {
             checkAnswer(false)
             disableChoices()
         }
 
         // Set click listener for Next button
-        binding.nextButton.setOnClickListener {
+        binding.nextButton?.setOnClickListener {
             quizViewModel.moveToNext()
             updateQuestion()
             enableChoices()
@@ -48,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion() {
+        // Fetch the question text resource ID and update the TextView
         val questionTextResId = quizViewModel.currentQuestionText
         binding.questionTextView.setText(questionTextResId)
     }
@@ -71,12 +70,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun disableChoices() {
-        binding.trueButton.isEnabled = false
-        binding.falseButton.isEnabled = false
+        // Disable both the True and False buttons after an answer is selected
+        binding.trueButton?.isEnabled = false
+        binding.falseButton?.isEnabled = false
     }
 
     private fun enableChoices() {
-        binding.trueButton.isEnabled = true
-        binding.falseButton.isEnabled = true
+        // Enable both the True and False buttons when moving to the next question
+        binding.trueButton?.isEnabled = true
+        binding.falseButton?.isEnabled = true
     }
 }
