@@ -1,4 +1,5 @@
 package com.example.hemanglabproject
+import android.util.Log
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -6,6 +7,8 @@ import androidx.lifecycle.ViewModel
 data class Question(val textResId: Int, val answer: Boolean)  // Define it here
 
 const val CURRENT_INDEX_KEY = "CURRENT_INDEX_KEY"
+
+private const val TAG = "MainActivity"
 
 class QuizViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
@@ -30,6 +33,7 @@ class QuizViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
         get() = questionBank[currentIndex].textResId
 
     fun moveToNext() {
+        Log.d(TAG, "Updating question text", Exception())
         currentIndex = (currentIndex + 1) % questionBank.size
     }
 }
