@@ -26,6 +26,11 @@ class MainActivity : AppCompatActivity() {
         // Set initial question
         updateQuestion()
 
+        binding.questionTextView.setOnClickListener {
+            quizViewModel.moveToNext()
+            updateQuestion()
+        }
+
         // Set click listeners for True/False buttons
         binding.trueButton?.setOnClickListener {
             checkAnswer(true)
