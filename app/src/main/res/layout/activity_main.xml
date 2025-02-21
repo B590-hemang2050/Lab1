@@ -37,6 +37,7 @@
             android:layout_height="wrap_content"
             android:text="@string/false_button" />
 
+
     </LinearLayout>
 
     <!-- Navigation Buttons -->
@@ -55,6 +56,13 @@
             app:icon="@drawable/arrow_left"
             app:iconGravity="start"
             android:layout_marginEnd="16dp" />
+
+        <Button
+            android:id="@+id/cheat_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/cheat_button" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/next_button"

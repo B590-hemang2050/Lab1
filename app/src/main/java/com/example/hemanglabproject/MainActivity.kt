@@ -1,11 +1,14 @@
 package com.example.hemanglabproject
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hemanglabproject.databinding.ActivityMainBinding
+import android.content.Intent
+import androidx.activity.result.contract.ActivityResultContracts
 
 private const val TAG = "MainActivity"
 
@@ -13,6 +16,17 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val quizViewModel: QuizViewModel by viewModels()
+
+    private val cheatLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            quizViewModel.isCheater =
+                result.data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+        }
+    }
+
     private var correctAnswers = 0  // Track correct answers
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +44,16 @@ class MainActivity : AppCompatActivity() {
             quizViewModel.moveToNext()
             updateQuestion()
         }
+
+        binding.cheatButton?.setOnClickListener {
+
+            val answerIsTrue = quizViewModel.currentQuestionAnswer
+            val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
+            cheatLauncher.launch(intent)
+//            quizViewModel.moveToNext()
+
+        }
+        updateQuestion()
 
         // Set click listeners for True/False buttons
         binding.trueButton?.setOnClickListener {
@@ -63,19 +87,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
-        val correctAnswer = quizViewModel.currentQuestionAnswer
+        val correctAnswer: Boolean = quizViewModel.currentQuestionAnswer
+
+        val messageResId = when {
+            quizViewModel.isCheater -> R.string.judgment_toast
+            userAnswer == correctAnswer -> R.string.correct_toast
+            else -> R.string.incorrect_toast
+        }
 
         // Update the score if the answer is correct
-        if (userAnswer == correctAnswer) {
-            correctAnswers++
-        }
+//        if (userAnswer == correctAnswer) {
+//            correctAnswers++
+//        }
 
         // Display correct/incorrect message
-        val messageResId = if (userAnswer == correctAnswer) {
-            R.string.correct_toast
-        } else {
-            R.string.incorrect_toast
-        }
+
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
