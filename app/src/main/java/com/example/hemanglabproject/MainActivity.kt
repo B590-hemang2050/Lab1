@@ -19,15 +19,14 @@ class MainActivity : AppCompatActivity() {
 
     private val cheatLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) {
-        result ->
+    ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            quizViewModel.isCheater =
-                result.data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+            val cheated = result.data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+            if (cheated) {
+                quizViewModel.markCheated()
+            }
         }
     }
-
-    private var correctAnswers = 0  // Track correct answers
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +36,6 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG, "Got a QuizViewModel: $quizViewModel")
 
-        // Set initial question
         updateQuestion()
 
         binding.questionTextView.setOnClickListener {
@@ -46,16 +44,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.cheatButton?.setOnClickListener {
-
             val answerIsTrue = quizViewModel.currentQuestionAnswer
             val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
             cheatLauncher.launch(intent)
-//            quizViewModel.moveToNext()
-
         }
-        updateQuestion()
 
-        // Set click listeners for True/False buttons
         binding.trueButton?.setOnClickListener {
             checkAnswer(true)
             disableChoices()
@@ -66,7 +59,6 @@ class MainActivity : AppCompatActivity() {
             disableChoices()
         }
 
-        // Set click listener for Next button
         binding.nextButton?.setOnClickListener {
             quizViewModel.moveToNext()
             updateQuestion()
@@ -81,39 +73,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion() {
-        // Fetch the question text resource ID and update the TextView
         val questionTextResId = quizViewModel.currentQuestionText
         binding.questionTextView.setText(questionTextResId)
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer: Boolean = quizViewModel.currentQuestionAnswer
+        val currentIndex = quizViewModel.currentIndex
 
         val messageResId = when {
-            quizViewModel.isCheater -> R.string.judgment_toast
+            quizViewModel.isQuestionCheated(currentIndex) -> R.string.judgment_toast
             userAnswer == correctAnswer -> R.string.correct_toast
             else -> R.string.incorrect_toast
         }
-
-        // Update the score if the answer is correct
-//        if (userAnswer == correctAnswer) {
-//            correctAnswers++
-//        }
-
-        // Display correct/incorrect message
-
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
     private fun disableChoices() {
-        // Disable both the True and False buttons after an answer is selected
         binding.trueButton?.isEnabled = false
         binding.falseButton?.isEnabled = false
     }
 
     private fun enableChoices() {
-        // Enable both the True and False buttons when moving to the next question
         binding.trueButton?.isEnabled = true
         binding.falseButton?.isEnabled = true
     }
